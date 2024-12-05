@@ -58,13 +58,13 @@
       background-color: #e0e0e0;
     }
     <style>
-  .checkbox-container {
+  .inline-label {
     display: inline-flex;
-    align-items: center; /* Aligns checkbox and label vertically */
-    gap: 0.5em; /* Adds space between checkbox and label */
+    align-items: center; /* Aligns checkbox and text vertically */
+    gap: 0.5em; /* Adds spacing between the checkbox and the label text */
   }
 
-  .checkbox-container input[type="checkbox"] {
+  input[type="checkbox"] {
     width: 1.2em;
     height: 1.2em;
     appearance: none;
@@ -75,12 +75,12 @@
     position: relative;
   }
 
-  .checkbox-container input[type="checkbox"]:checked {
+  input[type="checkbox"]:checked {
     background-color: #009688; /* Green background for checked */
     border-color: #009688;
   }
 
-  .checkbox-container input[type="checkbox"]:checked::before {
+  input[type="checkbox"]:checked::before {
     content: "✔";
     font-size: 0.9em;
     color: white;
@@ -90,8 +90,9 @@
     transform: translate(-50%, -50%);
   }
 
-  .checkbox-container label {
-    cursor: pointer; /* Makes the label clickable */
+  label {
+    cursor: pointer;
+    font-size: 1em; /* Adjust font size as needed */
   }
 </style>
 </head>
@@ -128,8 +129,9 @@
         <label for="categoryBudget">Budget:</label>
         <input type="number" id="categoryBudget" required>
       </div>
-<div class="form-field"> 
-  <label <input type="checkbox" id="applyToAll"> Apply to All Months
+<div class="form-field">
+  <label class="inline-label">
+    <input type="checkbox" id="applyToAll"> Apply to all months
   </label>
 </div>
     </form>
