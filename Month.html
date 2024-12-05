@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monthly Budget Manager</title>
+  <style>
+    /* General styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 1em;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    .form-field {
+      margin-bottom: 1em;
+    }
+    .form-field label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.5em;
+    }
+    .form-field input, .form-field select, .form-field button {
+      width: 100%;
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    .form-field button {
+      background-color: #005f5f;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .form-field button:hover {
+      background-color: #004c4c;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      margin: 0.5em 0;
+      padding: 0.5em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f1f1f1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    li:hover {
+      background-color: #e0e0e0;
+    }
+    <style>
+  .checkbox-container {
+    display: inline-flex;
+    align-items: center; /* Aligns checkbox and label vertically */
+    gap: 0.5em; /* Adds space between checkbox and label */
+  }
+
+  .checkbox-container input[type="checkbox"] {
+    width: 1.2em;
+    height: 1.2em;
+    appearance: none;
+    background-color: #f0f0f0;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .checkbox-container input[type="checkbox"]:checked {
+    background-color: #009688; /* Green background for checked */
+    border-color: #009688;
+  }
+
+  .checkbox-container input[type="checkbox"]:checked::before {
+    content: "✔";
+    font-size: 0.9em;
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .checkbox-container label {
+    cursor: pointer; /* Makes the label clickable */
+  }
+</style>
+</head>
+<body>
+  <h1>Monthly Budget Manager</h1>
+
+  <!-- Month Selector -->
+  <div class="form-field">
+    <label for="monthSelector">Select Month:</label>
+    <select id="monthSelector">
+      <option value="January">January</option>
+      <option value="February">February</option>
+      <option value="March">March</option>
+      <option value="April">April</option>
+      <option value="May">May</option>
+      <option value="June">June</option>
+      <option value="July">July</option>
+      <option value="August">August</option>
+      <option value="September">September</option>
+      <option value="October">October</option>
+      <option value="November">November</option>
+      <option value="December">December</option>
+    </select>
+  </div>
+
+  <!-- Budget Categories for the Month -->
+  <div>
+    <form id="categoryForm">
+      <div class="form-field">
+        <label for="categoryName">Category Name:</label>
+        <input type="text" id="categoryName" required>
+      </div>
+      <div class="form-field">
+        <label for="categoryBudget">Budget:</label>
+        <input type="number" id="categoryBudget" required>
+      </div>
+<div class="form-field"> 
+  <label <input type="checkbox" id="applyToAll"> Apply to All Months
+  </label>
+</div>
+    </form>
+  </div>
+
+  <!-- Categories List -->
+  <ul id="categoryList">
+    <!-- Categories will be dynamically added here -->
+  </ul>
+
+  <script>
+    // Store data for each month using localStorage
+    const monthsDataKey = "monthsData";
+    let monthsData = JSON.parse(localStorage.getItem(monthsDataKey)) || {
+      January: [],
+      February: [],
+      March: [],
+      April: [],
+      May: [],
+      June: [],
+      July: [],
+      August: [],
+      September: [],
+      October: [],
+      November: [],
+      December: []
+    };
+
+    const monthSelector = document.getElementById("monthSelector");
+    const categoryList = document.getElementById("categoryList");
+    const categoryForm = document.getElementById("categoryForm");
+    const applyToAll = document.getElementById("applyToAll");
+
+    // Save data to localStorage
+    function saveData() {
+      localStorage.setItem(monthsDataKey, JSON.stringify(monthsData));
+    }
+
+    // Render categories for the selected month
+    function renderCategories() {
+      const selectedMonth = monthSelector.value;
+      const categories = monthsData[selectedMonth];
+      categoryList.innerHTML = "";
+
+      categories.forEach((category, index) => {
+        const li = document.createElement("li");
+        li.textContent = `${category.name} - $${category.budget.toFixed(2)}`;
+        li.onclick = () => editCategory(index);
+        categoryList.appendChild(li);
+      });
+    }
+
+    // Add new category
+    categoryForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const selectedMonth = monthSelector.value;
+      const name = document.getElementById("categoryName").value.trim();
+      const budget = parseFloat(document.getElementById("categoryBudget").value);
+
+      if (name && !isNaN(budget)) {
+        if (applyToAll.checked) {
+          // Apply to all months
+          for (const month in monthsData) {
+            // Check if category already exists
+            const existingIndex = monthsData[month].findIndex(cat => cat.name === name);
+            if (existingIndex >= 0) {
+              monthsData[month][existingIndex].budget = month === selectedMonth ? budget : 0; // Set budget only for selected month
+            } else {
+              monthsData[month].push({ name, budget: month === selectedMonth ? budget : 0 });
+            }
+          }
+        } else {
+          // Add only to the selected month
+          monthsData[selectedMonth].push({ name, budget });
+        }
+
+        saveData();
+        renderCategories();
+        categoryForm.reset();
+      }
+    });
+
+    // Edit existing category
+    function editCategory(index) {
+      const selectedMonth = monthSelector.value;
+      const categories = monthsData[selectedMonth];
+      const category = categories[index];
+      const newName = prompt("Edit Category Name:", category.name);
+      const newBudget = parseFloat(prompt("Edit Budget:", category.budget));
+
+      if (newName && !isNaN(newBudget)) {
+        categories[index] = { name: newName, budget: newBudget };
+        saveData();
+        renderCategories();
+      }
+    }
+
+    // Update displayed categories when the month changes
+    monthSelector.addEventListener("change", renderCategories);
+
+    // Initial render
+    renderCategories();
+  </script>
+</body>
+</html>
